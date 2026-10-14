@@ -1,0 +1,91 @@
+<main class="container py-4">
+  <h1 class="h2 mb-2">Catálogo de productos</h1>
+  <p class="text-muted">
+    Consulta de JSON público con Angular HttpClient. La búsqueda y el filtro se aplican localmente.
+  </p>
+
+  <div class="row g-2 align-items-center mb-3">
+    <div class="col-md-5">
+      <input
+        class="form-control"
+        type="search"
+        placeholder="Buscar por nombre"
+        aria-label="Buscar productos por nombre"
+        [(ngModel)]="busqueda"
+      >
+    </div>
+    <div class="col-md-3">
+      <div class="form-check">
+        <input
+          id="insuficientes"
+          type="checkbox"
+          class="form-check-input"
+          [(ngModel)]="soloInsuficientes"
+        >
+        <label for="insuficientes" class="form-check-label">
+          Solo stock insuficiente
+        </label>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <button
+        class="btn w-100"
+        [class.btn-outline-primary]="!soloStockMayor20"
+        [class.btn-primary]="soloStockMayor20"
+        type="button"
+        [attr.aria-pressed]="soloStockMayor20"
+        (click)="soloStockMayor20 = !soloStockMayor20"
+      >
+        Stock &gt; 20
+      </button>
+    </div>
+    <div class="col-md-2">
+      <button
+        class="btn btn-primary w-100"
+        type="button"
+        [disabled]="cargando"
+        (click)="cargarProductos()"
+      >
+        Recargar
+      </button>
+    </div>
+  </div>
+
+  <p *ngIf="cargando" role="status">Consultando productos...</p>
+  <div *ngIf="error" class="alert alert-danger" role="alert">{{ error }}</div>
+
+  <div class="table-responsive" *ngIf="!cargando && !error">
+    <table class="table table-striped table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Nombre</th>
+          <th scope="col">Precio</th>
+          <th scope="col">Stock</th>
+          <th scope="col">Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let producto of productosFiltrados">
+          <td>{{ producto.id }}</td>
+          <td>{{ producto.nombre }}</td>
+          <td>{{ producto.precio | currency:'PEN':'symbol':'1.2-2' }}</td>
+          <td>{{ producto.stock }}</td>
+          <td>
+            <span
+              class="badge"
+              [ngClass]="producto.estadoStock === 'OK' ? 'bg-success' : 'bg-danger'"
+            >
+              {{ producto.estadoStock }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Resultados: {{ productosFiltrados.length }}</p>
+    <p *ngIf="productosFiltrados.length === 0" class="text-muted">
+      No se encontraron productos.
+    </p>
+  </div>
+</main>
